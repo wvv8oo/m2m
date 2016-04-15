@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{article.title}} - {{blog.title}}</title>
+  {{>head}}
+</head>
+<body class="home-template">
+{{>header}}
+<div class="content container">
+    <div class="post">
+        <h1>{{article.title}}</h1>
+      {{{article.content}}}
+    </div>
+</div>
+{{>footer}}
+</body>
+</html>

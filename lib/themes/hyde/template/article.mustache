@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{article.meta.title}} - {{blog.title}}</title>
+  {{>head}}
+</head>
+<body class="home-template">
+  {{>header}}
+  <div class="content container">
+      {{{article.toc_html}}}
+      <div class="post">
+        <h1>{{article.meta.title}}</h1>
+        <span class="post-date">{{article.publish_date}}</span>
+        {{{article.body_html}}}
+      </div>
+
+      <div class="related">
+          <h2>Related Posts</h2>
+          <ul class="posts">
+            {{#article.previous}}
+                <li class="previous">
+                    Previous: <a href="{{article.previous.link}}">{{article.previous.title}}</a>
+                </li>
+            {{/article.previous}}
+
+            {{#article.next}}
+                <li class="next">
+                    Next: <a href="{{article.next.link}}">{{article.next.title}}</a>
+                </li>
+            {{/article.next}}
+
+            {{#article.tags}}
+                <li class="tag">
+                    Tags:
+                  {{#article.tags}}
+                      <a href="/tag/{{.}}">{{.}}</a>
+                  {{/article.tags}}
+                </li>
+            {{/article.tags}}
+          </ul>
+      </div>
+  </div>
+</body>
+</html>
