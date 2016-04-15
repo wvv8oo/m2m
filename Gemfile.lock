@@ -1,0 +1,23 @@
+GEM
+  remote: https://ruby.taobao.org/
+  specs:
+    commander (4.4.0)
+      highline (~> 1.7.2)
+    highline (1.7.8)
+    kramdown (1.10.0)
+    mini_portile2 (2.0.0)
+    mustache (1.0.0)
+    nokogiri (1.6.7)
+      mini_portile2 (~> 2.0.0.rc2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  commander (= 4.4.0)
+  kramdown (= 1.10.0)
+  mustache (= 1.0)
+  nokogiri (= 1.6.7)
+
+BUNDLED WITH
+   1.11.2
