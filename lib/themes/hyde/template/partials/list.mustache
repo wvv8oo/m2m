@@ -1,0 +1,20 @@
+<div class="posts">
+    {{#articles}}
+        <div class="post">
+            <h1><a href="{{root/relative_path}}{{relative_url}}">{{meta.title}}</a></h1>
+            <span class="post-date">{{meta.publish_date}}</span>
+            <p>{{excerpt}}&hellip;</p>
+        </div>
+    {{/articles}}
+</div>
+
+<!-- Pagination links -->
+<div class="pagination">
+    {{#nav.previous}}
+        <a class="previous" href="{{nav.previous}}">&larr; 上一页</a>
+    {{/nav.previous}}
+
+    {{#nav.next}}
+        <a class="next" href="{{nav.next}}">下一页 &rarr;</a>
+    {{/nav.next}}
+</div>
