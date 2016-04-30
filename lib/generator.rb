@@ -77,6 +77,8 @@ class Generator
         articles = []
         start_index = page_index * @page_size - @page_size
         end_index = start_index + @page_size
+        #总页数
+        page_count = (items.length.to_f / @page_size).ceil
 
         path = dir + (page_index == 1 ? 'index.html' : "page-#{page_index}.html")
 
@@ -84,17 +86,40 @@ class Generator
             articles.push @store.articles[current]
         }
 
+
+
         data = {
-            'articles' => articles
+            'articles' => articles,
+            'nav' => self.get_nav(page_index, page_count)
         }
 
         self.compiler path, template_name, data
     end
 
+    #处理上一页下一页
+    def get_nav(page_index, page_count)
+        nav = {}
+        #上一页
+        if(page_index == 2)
+            nav['previous'] = 'index.html'
+        elsif(page_index > 2)
+            nav['previous'] = "page-#{page_index - 1}.html"
+        end
+
+        #下一页
+        if(page_index < page_count)
+            nav['next'] = "page-#{page_index + 1}.html"
+        end
+
+        #以后要处理总的分页信息
+
+        nav
+    end
+
     #编译模板
     def compiler(filename, template_name, data)
         data['blog'] = @util.config['blog']
-        data['root'] = @util.get_relative_dot(filename)
+        data['root/relative_path'] = @util.get_relative_dot(filename)
 
         @compiler.execute filename, template_name, data
     end
