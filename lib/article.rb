@@ -33,9 +33,13 @@ class Article
         result['relative_path'] = relative_path
         result['relative_url'] = relative_path.to_s.gsub(/\.md$/, '.html')
 
+
         meta_result = @meta.analysis original
-        meta = meta_result['meta']
+        meta = meta_result['meta'] || {}
         body = meta_result['body']
+
+        meta['title'] = File::basename(file, '.md') if !meta['title']
+        meta['publish_date'] = result['mtime'] if !meta['publish_date']
 
         result['meta'] = meta
         result['body_markdown'] = body
