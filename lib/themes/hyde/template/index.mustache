@@ -7,26 +7,7 @@
 <body class="home-template">
 {{>header}}
 <div class="content container">
-    <div class="posts">
-        {{#articles}}
-          <div class="post">
-            <h1><a href="{{link}}">{{title}}</a></h1>
-            <span class="post-date">{{publish_date}} [{{publish_date}}]</span>
-              <p>{{excerpt}}&hellip;</p>
-        </div>
-        {{/articles}}
-    </div>
-
-    <!-- Pagination links -->
-    <div class="pagination">
-      {{#nav.previous}}
-          <a class="previous" href="/page/{{nav.previous}}/">&larr; Newer Posts</a>
-      {{/nav.previous}}
-
-      {{#nav.next}}
-          <a class="next" href="/page/{{nav.next}}/">Older Posts &rarr;</a>
-      {{/nav.next}}
-    </div>
+    {{>list}}
 </div>
 
 {{>footer}}
