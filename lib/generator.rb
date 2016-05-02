@@ -29,10 +29,6 @@ class Generator
         self.generate_index items, 1, 'home', ''
     end
 
-    def get_app_info()
-
-    end
-
     #创建所有的索引页, 如果有文件夹, 则根据配置创建文件夹中的索引页
     #不会创建首页的index
     def generate_all_index(node, dir, ignore_first_index)
@@ -118,6 +114,7 @@ class Generator
 
     #编译模板
     def compiler(filename, template_name, data)
+        data['product'] = @util.get_product
         data['blog'] = @util.config['blog']
         data['root/relative_path'] = @util.get_relative_dot(filename)
 
