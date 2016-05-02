@@ -13,8 +13,13 @@ class Util
         @workbench = ''
     end
 
-    def app_name
-        'roblog'
+    #获取产品相关的信息
+    def get_product
+        {
+            'name' => 'roblog',
+            'version' => '0.0.1',
+            'url' => 'http://roblog.silky.com'
+        }
     end
 
     def local_theme_dir
