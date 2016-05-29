@@ -18,7 +18,7 @@ class Article
     def convert(relative_path)
         result = Hash.new
 
-        file = File::join @util.workbench, relative_path
+        file = File::join @util.content_dir, relative_path
 
         #路径的MD5值
         result['relative_path_md5'] = Digest::SHA256.hexdigest(relative_path.to_s)[0..15]
