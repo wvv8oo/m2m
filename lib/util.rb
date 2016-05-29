@@ -9,8 +9,14 @@ class Util
         file = File::join(Dir::pwd, 'config.json')
         @config = JSON.parse IO.read(file)
 
+        #本地主题的目录
         @local_theme_dir = '.theme'
+        #当前的工作目录
         @workbench = ''
+        #markdown的文件目录
+        @content_dir = ''
+        #构建的目标目录
+        @build_dir = nil
     end
 
     #获取产品相关的信息
@@ -22,6 +28,14 @@ class Util
         }
     end
 
+    def build_dir
+        @build_dir
+    end
+
+    def content_dir
+        @content_dir
+    end
+
     def local_theme_dir
         @local_theme_dir
     end
@@ -29,6 +43,14 @@ class Util
     #用户的配置文件
     def config
         @config
+    end
+
+    def workbench
+        @workbench
+    end
+
+    def project_name
+        @project_name
     end
 
     #临时目录
@@ -42,7 +64,7 @@ class Util
     def write_file(file, content)
         dir = File::dirname file
         #如果不在存文件夹, 则先创建
-        puts dir
+        # puts dir
         FileUtils.mkpath(dir) if not File::exists?(dir)
         #写入文件
         IO.write(file, content)
@@ -78,10 +100,21 @@ class Util
     end
 
     def workbench=(dir)
+        #工作目录
         @workbench = dir
-    end
+        #项目名称
+        @project_name = File::basename dir
 
-    def workbench
-        @workbench
+        #获取文件的根目录
+        @content_dir = Pathname.new(dir) + Pathname.new(@config['content'] || './')
+
+        #如果用户有配置构建目标，则使用用户的配置
+        target = @config['target']
+        if(target)
+            @build_dir = Pathname.new(@workbench) + Pathname.new(target)
+        else
+            #没有的情况下，使用临时目录构建
+            @build_dir = Pathname.new File::join(@temp_dir, @project_name)
+        end
     end
 end
