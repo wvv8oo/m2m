@@ -136,8 +136,7 @@ class Generator
 
     #复制文件到目标
     def copy(source, filename)
-        target_dir = @compiler.target_dir
-        target = File::join target_dir, filename
+        target = File::join @util.build_dir, filename
 
         FileUtils.cp_r source, target
     end
@@ -150,6 +149,11 @@ class Generator
             next if @util.is_shadow_file?(filename) or
                 @util.is_markdown_file?(filename) or
                 @util.is_user_ignore_file?(filename)
+
+            current_path = Pathname.new File::join(@util.workbench, filename)
+            #build和内容退出
+            next if @util.build_dir === current_path or
+                @util.content_dir === current_path
 
             this.copy File::join(@util.workbench, filename), filename
         }
