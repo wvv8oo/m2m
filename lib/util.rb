@@ -22,9 +22,9 @@ class Util
     #获取产品相关的信息
     def get_product
         {
-            'name' => 'roblog',
+            'name' => 'm2b',
             'version' => '0.0.1',
-            'url' => 'http://roblog.silky.com'
+            'url' => 'http://m2b.wvv8oo.com'
         }
     end
 
@@ -55,7 +55,7 @@ class Util
 
     #临时目录
     def temp_dir
-        dir = File.join(Dir.home, ".roblog")
+        dir = File.join(Dir.home, ".m2b")
         #如果不存在则创建一个
         Dir::mkdir(dir) if(!File::exists?(dir))
         dir
