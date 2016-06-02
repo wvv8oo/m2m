@@ -6,7 +6,12 @@ class Util
     include Singleton
 
     def initialize
-        file = File::join(Dir::pwd, 'config.json')
+        file = File::join(Dir::pwd, 'm2b.config')
+        if not File::exists?(file)
+            puts 'Warning: m2b.config is not found, please use <m2b init> to create it.'
+            exit(1)
+        end
+
         @config = JSON.parse IO.read(file)
 
         #本地主题的目录
