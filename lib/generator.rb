@@ -21,6 +21,7 @@ class Generator
         self.copy_workbench_resource
         self.generate_home
         self.generate_all_index @store.tree, '', true
+        puts 'Done...'
     end
 
     #创建首页
