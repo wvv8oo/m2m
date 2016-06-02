@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'commander'
+require_relative '../lib/generator'
+
+class MyApplication
+  include Commander::Methods
+  # include whatever modules you need
+
+  def run
+    program :name, 'm2b'
+    program :version, '0.0.1'
+    program :description, 'Markdown to blog'
+
+    command :build do |c|
+      c.syntax = 'm2b build [options]'
+      c.summary = ''
+      c.description = ''
+      c.example 'description', 'command example'
+      c.option '--some-switch', 'Some switch that does something'
+      c.action do |args, options|
+        #暂时实现build 目录
+        Util.instance.workbench = Dir::pwd
+        Generator.new
+        # Do something or c.when_called M2b::Commands::Build
+      end
+    end
+
+    run!
+  end
+end
+
+MyApplication.new.run
+
+# MyApplication.new.run if $0 == __FILE__
