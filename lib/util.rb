@@ -10,9 +10,9 @@ class Util
         #本地主题的目录
         @local_theme_dir = '.theme'
         #当前的工作目录
-        @workbench = ''
+        @workbench = nil
         #markdown的文件目录
-        @content_dir = ''
+        @content_dir = nil
         #构建的目标目录
         @build_dir = nil
         #配置文件
@@ -25,6 +25,11 @@ class Util
     end
 
     def content_dir
+        #获取文件的根目录
+        if not @content_dir
+            @content_dir = self.get_merge_path(@config['content'] || './', @workbench)
+        end
+
         @content_dir
     end
 
@@ -96,8 +101,6 @@ class Util
         @workbench = dir
         #项目名称
         @project_name = File::basename dir
-        #获取文件的根目录
-        @content_dir = self.get_merge_path(@config['content'] || './', @workbench)
     end
 
     ####################  获取 ####################
@@ -139,6 +142,11 @@ class Util
         FileUtils.mkpath(dir) if not File::exists?(dir)
         #写入文件
         IO.write(file, content)
+    end
+
+    def error(log, level = 1)
+        puts log
+        exit level
     end
 
     ####################  判断 ####################

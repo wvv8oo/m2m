@@ -349,3 +349,7 @@ a:hover {
 .not_found h1{
     font-size: 15em;
 }
+
+.toc li li{
+    padding-left: 16px;
+}
