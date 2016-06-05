@@ -6,14 +6,6 @@ class Util
     include Singleton
 
     def initialize
-        file = File::join(Dir::pwd, 'm2b.config')
-        if not File::exists?(file)
-            puts 'Warning: m2b.config is not found, please use <m2b init> to create it.'
-            exit(1)
-        end
-
-        @config = JSON.parse IO.read(file)
-
         #本地主题的目录
         @local_theme_dir = '.theme'
         #当前的工作目录
@@ -33,7 +25,27 @@ class Util
         }
     end
 
+    #设置构建目录
+    def build_dir=(dir)
+        @build_dir = dir
+    end
+
+    #最终的构建目录
     def build_dir
+        dir = @build_dir
+        #已经处理过了
+        return dir if dir.class == Pathname
+
+        #如果没有指定构建目录，则使用配置文件的目录
+        dir = @config['target'] if not dir
+        #依然没有获取准确的目录，则使用使用临时目录
+        dir = File::join(@temp_dir, @project_name) if not dir
+
+        #如果是字符类型，则获取相对于workbench的目录
+        if dir.class == String
+            @build_dir = self.get_merge_path(dir)
+        end
+
         @build_dir
     end
 
@@ -50,9 +62,6 @@ class Util
         @config
     end
 
-    def workbench
-        @workbench
-    end
 
     def project_name
         @project_name
@@ -104,22 +113,40 @@ class Util
         return '../' * (relative_url.split('/').length - 1)
     end
 
+    #合并两个路径
+    def get_merge_path(relative_path, base_path = Dir::pwd)
+        base_path = Pathname.new base_path
+        return base_path if not relative_path
+        base_path + Pathname.new(relative_path)
+    end
+
+    #获取相对路径，如果没有设定source，则使用当前的工作目录
+    def get_relative_path(target, source = Dir::pwd)
+        target = Pathname.new(target) if target.class == String
+        source = Pathname.new(source) if source.class == String
+        source.relative_path_from(target)
+    end
+
+    #获取工作台
+    def workbench
+        @workbench
+    end
+
     def workbench=(dir)
+        #在设置工作目录的时候，检查配置文件
+        file = File::join(dir, 'm2b.config')
+        if not File::exists?(file)
+            puts 'Warning: m2b.config is not found, please use <m2b init --config> to create it.'
+            exit(1)
+        end
+        #读取配置文件
+        @config = JSON.parse IO.read(file)
+
         #工作目录
         @workbench = dir
         #项目名称
         @project_name = File::basename dir
-
         #获取文件的根目录
-        @content_dir = Pathname.new(dir) + Pathname.new(@config['content'] || './')
-
-        #如果用户有配置构建目标，则使用用户的配置
-        target = @config['target']
-        if(target)
-            @build_dir = Pathname.new(@workbench) + Pathname.new(target)
-        else
-            #没有的情况下，使用临时目录构建
-            @build_dir = Pathname.new File::join(@temp_dir, @project_name)
-        end
+        @content_dir = self.get_merge_path(@config['content'] || './', @workbench)
     end
 end
