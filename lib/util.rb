@@ -1,4 +1,5 @@
 require 'json'
+require 'yaml' 
 require 'fileutils'
 require 'singleton'
 
@@ -14,6 +15,31 @@ class Util
         @content_dir = ''
         #构建的目标目录
         @build_dir = nil
+        #配置文件
+        @config_file = nil
+    end
+
+    ####################  属性 ####################
+    def config_file
+        @config_file
+    end
+
+    def content_dir
+        @content_dir
+    end
+
+    def local_theme_dir
+        @local_theme_dir
+    end
+
+    #用户的配置文件
+    def config
+        @config
+    end
+
+
+    def project_name
+        @project_name
     end
 
     #获取产品相关的信息
@@ -39,7 +65,7 @@ class Util
         #如果没有指定构建目录，则使用配置文件的目录
         dir = @config['target'] if not dir
         #依然没有获取准确的目录，则使用使用临时目录
-        dir = File::join(@temp_dir, @project_name) if not dir
+        dir = File::join(@get_temp_dir, @project_name) if not dir
 
         #如果是字符类型，则获取相对于workbench的目录
         if dir.class == String
@@ -49,61 +75,38 @@ class Util
         @build_dir
     end
 
-    def content_dir
-        @content_dir
+    #获取工作台
+    def workbench
+        @workbench
     end
 
-    def local_theme_dir
-        @local_theme_dir
+    def workbench=(dir)
+        #在设置工作目录的时候，检查配置文件
+        @config_file = self.get_merge_path 'm2b.config', dir
+        if not File::exists?(@config_file)
+            puts 'Warning: m2b.config is not found, please use <m2b init --config> to create it.'
+            exit(1)
+        end
+        #读取配置文件
+        @config = JSON.parse IO.read(@config_file)
+        #使用yaml的格式
+        # @config = YAML.load IO.read(file)
+
+        #工作目录
+        @workbench = dir
+        #项目名称
+        @project_name = File::basename dir
+        #获取文件的根目录
+        @content_dir = self.get_merge_path(@config['content'] || './', @workbench)
     end
 
-    #用户的配置文件
-    def config
-        @config
-    end
-
-
-    def project_name
-        @project_name
-    end
-
+    ####################  获取 ####################
     #临时目录
-    def temp_dir
+    def get_temp_dir
         dir = File.join(Dir.home, ".m2b")
         #如果不存在则创建一个
         Dir::mkdir(dir) if(!File::exists?(dir))
         dir
-    end
-
-    def write_file(file, content)
-        dir = File::dirname file
-        #如果不在存文件夹, 则先创建
-        # puts dir
-        FileUtils.mkpath(dir) if not File::exists?(dir)
-        #写入文件
-        IO.write(file, content)
-    end
-
-    #检查一个文件是否为markdown
-    def is_markdown_file?(file)
-        (/\.(md)|(markdown)$/i =~ file) != nil
-    end
-
-    #检查文件是否为.开头的文件
-    def is_shadow_file?(file)
-        (/^\./ =~ file) != nil
-    end
-
-    #是否为用户忽略的文件
-    def is_user_ignore_file?(file)
-        ignore = @config['ignore']
-        return false if not ignore
-
-        ignore.each { |current|
-            #TODO 这里还需要再增加
-        }
-
-        return false
     end
 
     #获取一个相对路径离root有几个..
@@ -127,26 +130,37 @@ class Util
         source.relative_path_from(target)
     end
 
-    #获取工作台
-    def workbench
-        @workbench
+    ####################  操作 ####################
+
+    def write_file(file, content)
+        dir = File::dirname file
+        #如果不在存文件夹, 则先创建
+        # puts dir
+        FileUtils.mkpath(dir) if not File::exists?(dir)
+        #写入文件
+        IO.write(file, content)
     end
 
-    def workbench=(dir)
-        #在设置工作目录的时候，检查配置文件
-        file = File::join(dir, 'm2b.config')
-        if not File::exists?(file)
-            puts 'Warning: m2b.config is not found, please use <m2b init --config> to create it.'
-            exit(1)
-        end
-        #读取配置文件
-        @config = JSON.parse IO.read(file)
+    ####################  判断 ####################
+    #检查一个文件是否为markdown
+    def is_markdown_file?(file)
+        (/\.(md)|(markdown)$/i =~ file) != nil
+    end
 
-        #工作目录
-        @workbench = dir
-        #项目名称
-        @project_name = File::basename dir
-        #获取文件的根目录
-        @content_dir = self.get_merge_path(@config['content'] || './', @workbench)
+    #检查文件是否为.开头的文件
+    def is_shadow_file?(file)
+        (/^\./ =~ file) != nil
+    end
+
+    #是否为用户忽略的文件
+    def is_user_ignore_file?(file)
+        ignore = @config['ignore']
+        return false if not ignore
+
+        ignore.each { |current|
+            #TODO 这里还需要再增加
+        }
+
+        return false
     end
 end
