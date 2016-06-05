@@ -16,7 +16,7 @@ PLATFORMS
 DEPENDENCIES
   commander (= 4.4.0)
   kramdown (= 1.10.0)
-  mustache (= 1.0)
+  mustache (= 1.0.3)
   nokogiri (= 1.6.7)
 
 BUNDLED WITH
