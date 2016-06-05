@@ -37,7 +37,7 @@ class Compiler
         #当前有theme目录
         return dir if(File::exists?(dir))
 
-        base_dir = File::join(Pathname.new(File.dirname(__FILE__)), 'theme')
+        base_dir = File::join(Pathname.new(File.dirname(__FILE__)), 'themes')
 
         
         #根据用户配置获取theme
