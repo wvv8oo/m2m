@@ -36,6 +36,7 @@ class Meta
         #如果没有匹配到, 则body就是完整的original
         if matches == nil
             result['body'] = original
+            return result
         end
 
         #获取body内容
