@@ -151,10 +151,13 @@ class Generator
                 @util.is_markdown_file?(filename) or
                 @util.is_user_ignore_file?(filename)
 
-            current_path = Pathname.new File::join(@util.workbench, filename)
+            #当前的路径
+            current_path = @util.get_merge_path filename, @util.workbench
+
             #build和内容退出
             next if @util.build_dir === current_path or
-                @util.content_dir === current_path
+                @util.content_dir === current_path or
+                @util.config_file == current_path
 
             this.copy File::join(@util.workbench, filename), filename
         }
