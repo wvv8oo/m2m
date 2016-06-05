@@ -34,7 +34,7 @@ class Store
     end
 
     #从节点数据中, 获取items
-    def get_children(node)
+    def get_children(node = @data['tree'])
         node[@children_key]
     end
 
