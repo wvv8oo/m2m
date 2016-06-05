@@ -4,11 +4,13 @@ require 'rubygems'
 require 'commander'
 require_relative '../lib/generator'
 require_relative './build'
+require_relative './mailer'
 
 class MyApplication
   include Commander::Methods
   # include whatever modules you need
-  include Build
+  include BuildCommand
+  include MailCommand
 
   def run
     program :name, 'm2b'
@@ -17,7 +19,11 @@ class MyApplication
     default_command  :build
 
     command :build do |c|
-      self.execute(c)
+      self.build(c)
+    end
+
+    command :mail do |c|
+      self.mail(c)
     end
     
     run!
