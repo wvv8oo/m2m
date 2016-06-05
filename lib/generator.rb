@@ -119,7 +119,7 @@ class Generator
         data['blog'] = @util.config['blog']
         data['root/relative_path'] = @util.get_relative_dot(filename)
 
-        @compiler.execute filename, template_name, data
+        @compiler.execute template_name, data, true, filename
     end
 
     #复制theme中的资源到目录

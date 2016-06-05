@@ -58,9 +58,11 @@ class Compiler
 
     #执行生成,
     #filename: 相对文件路径
-    def execute(filename, type, data)
+    def execute(type, data, auto_save = true, filename = '')
         template = self.read_template type
         html = Mustache.render(template, data.merge(@util.config))
+
+        return html if not auto_save
 
         file = File::join @util.build_dir, filename
         @util.write_file file, html
