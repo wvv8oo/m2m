@@ -26,8 +26,8 @@ class Generator
 
     #创建首页
     def generate_home
-        items = @store.get_items(@store.tree)
-        self.generate_index items, 1, 'home', ''
+        children = @store.get_children(@store.tree)
+        self.generate_index children, 1, 'home', ''
     end
 
     #创建所有的索引页, 如果有文件夹, 则根据配置创建文件夹中的索引页
@@ -35,9 +35,9 @@ class Generator
     def generate_all_index(node, dir, ignore_first_index)
         this = self
 
-        #创建items的所有索引
-        items = @store.get_items node
-        page_count = (items.length.to_f / @page_size).ceil
+        #创建children的所有索引
+        children = @store.get_children node
+        page_count = (children.length.to_f / @page_size).ceil
 
         #生成此文件夹下的所有索引页
         (1..page_count).each { |page_index|
@@ -45,12 +45,12 @@ class Generator
             next if page_index == 1 and ignore_first_index
 
             # puts dir, page_index
-            this.generate_index items, page_index, 'index', dir
+            this.generate_index children, page_index, 'index', dir
         }
 
         #遍历所有的文件夹节点, 递归调用
         node.each { |key, sub_node|
-            if not @store.is_items_key(key)
+            if not @store.is_children_key(key)
                 parent_dir = dir + key + '/'
                 this.generate_all_index sub_node, parent_dir, false
             end
@@ -70,16 +70,16 @@ class Generator
     end
 
     #创建索引页, 包括首页以及子目录的索引页
-    def generate_index(items, page_index, template_name, dir)
+    def generate_index(children, page_index, template_name, dir)
         articles = []
         start_index = page_index * @page_size - @page_size
         end_index = start_index + @page_size
         #总页数
-        page_count = (items.length.to_f / @page_size).ceil
+        page_count = (children.length.to_f / @page_size).ceil
 
         path = dir + (page_index == 1 ? 'index.html' : "page-#{page_index}.html")
 
-        items[start_index..end_index].each { |current|
+        children[start_index..end_index].each { |current|
             articles.push @store.articles[current]
         }
 
