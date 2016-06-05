@@ -1,8 +1,8 @@
 require 'commander'
 require_relative '../lib/generator'
 
-module Build
-	def execute(c)
+module BuildCommand
+	def build(c)
 		c.syntax = 'm2b build [options]'
 		c.summary = ''
 		c.description = ''
