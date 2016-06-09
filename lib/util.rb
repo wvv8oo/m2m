@@ -130,7 +130,7 @@ class Util
     def get_relative_path(target, source = Dir::pwd)
         target = Pathname.new(target) if target.class == String
         source = Pathname.new(source) if source.class == String
-        source.relative_path_from(target)
+        target.relative_path_from(source).to_s
     end
 
     ####################  操作 ####################
