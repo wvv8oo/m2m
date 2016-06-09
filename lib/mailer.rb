@@ -92,7 +92,7 @@ class Mailer
 	#添加广告
 	def get_ad()
 		<<EOF
-<div class="product">
+<div class="product" style="background-color: rgba(204, 204, 204, 0.26);padding: 4px 10px; text-align: right; font-size: 12px;">
 	本邮件由
 	<a href="https://github.com/wvv8oo/m2m" target="_blank">m2m</a>
 	根据Markdown自动转换并发送
