@@ -157,7 +157,7 @@ class Generator
             #build和内容退出
             next if @util.build_dir === current_path or
                 @util.content_dir === current_path or
-                @util.config_file == current_path
+                @util.is_config_file? current_path
 
             this.copy File::join(@util.workbench, filename), filename
         }

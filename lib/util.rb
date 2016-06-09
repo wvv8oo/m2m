@@ -6,6 +6,13 @@ require_relative './product'
 
 class Util
     include Singleton
+    
+    attr :config_file
+    attr :local_theme_dir
+    attr :config
+    attr :project_name
+    attr :workbench
+    attr :build_dir, true
 
     def initialize
         #本地主题的目录
@@ -16,15 +23,11 @@ class Util
         @content_dir = nil
         #构建的目标目录
         @build_dir = nil
-        #配置文件
-        @config_file = nil
+        #配置文件的文件名
+        @config_file = 'm2m.config'
     end
 
     ####################  属性 ####################
-    def config_file
-        @config_file
-    end
-
     def content_dir
         #获取文件的根目录
         if not @content_dir
@@ -34,19 +37,6 @@ class Util
         @content_dir
     end
 
-    def local_theme_dir
-        @local_theme_dir
-    end
-
-    #用户的配置文件
-    def config
-        @config
-    end
-
-
-    def project_name
-        @project_name
-    end
 
     #获取产品相关的信息
     def get_product
@@ -56,11 +46,6 @@ class Util
             'homepage' => M2M::HOMEPAGE,
             'repos' => M2M::REPOS
         }
-    end
-
-    #设置构建目录
-    def build_dir=(dir)
-        @build_dir = dir
     end
 
     #最终的构建目录
@@ -82,20 +67,15 @@ class Util
         @build_dir
     end
 
-    #获取工作台
-    def workbench
-        @workbench
-    end
-
     def workbench=(dir)
         #在设置工作目录的时候，检查配置文件
-        @config_file = self.get_merge_path 'm2m.config', dir
+        file = self.get_merge_path @config_file, dir
         if not File::exists?(@config_file)
             self.error '提示: 配置文件<m2m.config>不存在, 请使用命令<m2m init --config>创建'
         end
 
         #读取配置文件
-        @config = JSON.parse IO.read(@config_file)
+        @config = JSON.parse IO.read(file)
         #使用yaml的格式
         # @config = YAML.load IO.read(file)
 
@@ -152,6 +132,11 @@ class Util
     end
 
     ####################  判断 ####################
+    #判断一个文件是否为配置文件
+    def is_config_file?(file)
+        filename = self.get_relative_path file, @workbench
+        filename == @config_file
+    end
     #检查一个文件是否为markdown
     def is_markdown_file?(file)
         (/\.(md)|(markdown)$/i =~ file) != nil
