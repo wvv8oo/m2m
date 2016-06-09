@@ -2,6 +2,7 @@ require 'json'
 require 'yaml' 
 require 'fileutils'
 require 'singleton'
+require_relative './product'
 
 class Util
     include Singleton
@@ -50,9 +51,10 @@ class Util
     #获取产品相关的信息
     def get_product
         {
-            'name' => 'm2b',
-            'version' => '0.0.1',
-            'url' => 'http://m2b.wvv8oo.com'
+            'name' => M2M::NAME,
+            'version' => M2M::VERSION,
+            'homepage' => M2M::HOMEPAGE,
+            'repos' => M2M::REPOS
         }
     end
 
@@ -87,11 +89,11 @@ class Util
 
     def workbench=(dir)
         #在设置工作目录的时候，检查配置文件
-        @config_file = self.get_merge_path 'm2b.config', dir
+        @config_file = self.get_merge_path 'm2m.config', dir
         if not File::exists?(@config_file)
-            puts 'Warning: m2b.config is not found, please use <m2b init --config> to create it.'
-            exit(1)
+            self.error '提示: 配置文件<m2m.config>不存在, 请使用命令<m2m init --config>创建'
         end
+
         #读取配置文件
         @config = JSON.parse IO.read(@config_file)
         #使用yaml的格式
@@ -106,7 +108,7 @@ class Util
     ####################  获取 ####################
     #临时目录
     def get_temp_dir
-        dir = File.join(Dir.home, ".m2b")
+        dir = File.join(Dir.home, ".m2m")
         #如果不存在则创建一个
         Dir::mkdir(dir) if(!File::exists?(dir))
         dir

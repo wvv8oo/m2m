@@ -13,9 +13,9 @@ class MyApplication
   include MailCommand
 
   def run
-    program :name, 'm2b'
+    program :name, 'm2m'
     program :version, '0.0.1'
-    program :description, 'Markdown to blog'
+    program :description, 'Markdown to More'
     default_command  :build
 
     command :build do |c|

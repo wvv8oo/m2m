@@ -94,7 +94,7 @@ class Mailer
 		<<EOF
 <div class="product">
 	本邮件由
-	<a href="https://github.com/wvv8oo/m2b" target="_blank">m2m</a>
+	<a href="https://github.com/wvv8oo/m2m" target="_blank">m2m</a>
 	根据Markdown自动转换并发送
 </div>
 EOF
