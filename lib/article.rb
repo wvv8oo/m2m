@@ -20,6 +20,8 @@ class Article
 
         file = File::join @util.content_dir, relative_path
 
+        #原始路径
+        result['file'] = file
         #路径的MD5值
         result['relative_path_md5'] = Digest::SHA256.hexdigest(relative_path.to_s)[0..15]
 
