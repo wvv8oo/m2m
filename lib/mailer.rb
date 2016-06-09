@@ -22,6 +22,53 @@ class Mailer
         self.set_mail_defaults
 	end
 
+	#添加附件, 并返回替换后的body
+	def add_pictures(mail, article, body)
+    	images = body.scan(/<img.+src=["'](.+?)['"]/i)
+    	return body if images.length == 0
+
+    	root = Pathname.new File::dirname(article['file'])
+    	#去重，并去掉非相对路径的
+    	list = Hash.new
+    	images.each { | line |
+    		image = line[0]
+    		return if not /^[\.\/]/ =~ image
+
+    		#将全路径作为key，达到去重的效果
+    		file = (root + Pathname.new(image)).to_s
+    		list[file] = image
+    	}
+
+    	#遍历所有图片，添加到附件
+    	list.each do |file, src|
+    		mail.add_file file
+    		cid = mail.attachments.last.cid
+    		body = body.gsub(src, 'CID:' + cid)
+    	end
+
+    	body
+	end
+
+	#添加邮件的主体内容，包括body/处理附件等
+	def add_content(mail, article)
+		#获取body的内容
+		data = {
+			"article" => article
+		}
+		body = @compiler.execute 'mail', data, false
+		body = self.get_ad + body
+
+		#分析出图片列表
+		body = self.add_pictures mail, article, body
+
+		#添加邮件的HTML内容
+		mail.html_part = Mail::Part.new do
+		  content_type 'text/html; charset=UTF-8'
+		  body body
+		end
+	end
+
+	#设置邮件的默认配置
 	def set_mail_defaults
 		smtp_server = @mail_config['smtp']
 		port = @mail_config['port']
@@ -42,6 +89,17 @@ class Mailer
 		end
 	end
 
+	#添加广告
+	def get_ad()
+		<<EOF
+<div class="product">
+	本邮件由
+	<a href="https://github.com/wvv8oo/m2b" target="_blank">m2m</a>
+	根据Markdown自动转换并发送
+</div>
+EOF
+	end
+
 	#获取邮件接收人
 	def get_to(to)
 		if not to
@@ -56,17 +114,28 @@ class Mailer
 
 	#获取将要发送的markdown文件
 	def get_article(md_file)
+		items = @store.get_children()
+		return @util.error '没有找到任何的Markdown文件' if items.length == 0
+
 		#如果用户没有指定, 则取最新的
-		if not md_file
-			items = @store.get_children()
-			return @util.error '没有找到任何的Markdown文件' if items.length == 0
+		return @store.articles[items[0]] if not md_file
 
-			key = items[0]
+		special_article = nil
+		index = 0
+		begin
+			key = items[index]
 			article = @store.articles[key]
-			return article
-		end
+			file = article['file']
+			relative_path = @util.get_relative_path file, @util.workbench
 
-		#如果用户指定， 遍历所有文件，查找匹配的文章，如果有多个，则提示用户选择
+			special_article = article if relative_path == md_file
+
+
+			index += 1
+		end while special_article == nil and index < items.length
+
+		@util.error "当前目录下未找到Markdown文件 => #{md_file}" if not special_article
+		return special_article
 	end
 
 	#优先读取用户指定的，然后读取文章中指定的subject，再读取配置文件中的
@@ -98,101 +167,48 @@ class Mailer
 		subject
 	end
 
-# 	#获取邮件的message
-# 	def get_message_with_attachment(from, to, subject, body)
-# 		marker = 'AUNIQUEMARKER'
+	#警示用户，由用户确定是否发送
+	def alarm(relative_path, subject, to)
+		puts "您确定要发送这封邮件吗？"
+		puts "邮件标题：#{subject}"
+		puts "Markdown：#{relative_path}"
+		puts "收件人：#{to}"
+		puts ""
 
-# 		header = <<EOF
-# From: #{from}
-# To: #{to}
-# MIME-Version: 1.0
-# Content-type: multipart/mixed; boundary=#{marker}
-# Subject: #{subject}
-# --#{marker}
-# EOF
+		#提示用户是否需要发送
+	    result = ask("确认发送请按y或者回车，取消请按其它键", lambda { |yn| yn.downcase[0] == ?y or yn == ''})
 
-# 		body = <<EOF
-# Content-Type: text/html
-# Content-Transfer-Encoding:8bit
-
-# #{body}
-# --#{marker}
-# EOF
-
-# 		return header + body + self.get_attachment(body, marker)
-# 	end
-
-# 	#没有附件的message
-# 	def get_message(from, to, subject, body)
-# 		message = <<EOF
-# From: #{from}
-# To: #{to}
-# MIME-Version: 1.0
-# Content-type: text/html
-# Subject: #{subject}
-
-# #{body}
-# EOF
-# 		message
-# 	end
-
-# 	#根据邮件正方，分析附件，并附加到邮件内容中
-# 	def get_attachment(body, marker)
-# 		return ''
-# 	end
-
-# 	#发送邮件
-# 	def send(message, to)
-# 		#发送邮件
-# 		smtp_server = @mail_config['smtp']
-# 		port = @mail_config['port']
-# 		password = @mail_config['password']
-# 		username = @mail_config['account']
-
-# 		puts message
-# 		begin
-# 			Net::SMTP.start(smtp_server, port, 
-# 				'localhost', username, password) do |smtp|
-# 		     smtp.sendmail(message, username, [to])
-# 			end
-# 		rescue Exception => e  
-# 			puts '邮件发送失败，原因如下：'
-# 			print "Exception occured: " + e  
-# 		end 
-# 	end
-
+		@util.error '您中止了邮件的发送' if not result
+	end
 
 	#发送邮件
-	def execute(to, md_file, subject)
-		Mail::TestMailer.deliveries
+	def send(to, md_file, subject, force = false)
 		to = self.get_to to
 		from = self.get_from
 		article = self.get_article md_file
+
 		subject = self.get_subject subject, article
 
-		#获取body的内容
-		data = {
-			"article" => article
-		}
-		body = @compiler.execute 'mail', data, false
+		relative_path = @util.get_relative_path article['file'], @util.workbench
 
-		mail = Mail.deliver do
+		#警示用户是否需要发送
+		self.alarm relative_path, subject, to if not force
+
+		#创建一个mail的实例，以后再添加附件和html内容
+		mail = Mail.new do
 			from from
 			to to
 			subject subject
-			html_part do
-				content_type 'text/html; charset=UTF-8'
-				body body
-			end
 		end
 
-		puts "邮件发送成功 => #{subject}"
+		self.add_content mail, article
+	
+		# @util.write_file './send.log', mail.parts.last.decoded
+		mail.deliver
 
-		# return
-		# #获取邮件的message
-		# message = self.get_message from, to, subject, body
-
- 	# 	self.send message, to
- 	# 	puts '发送成功'
+		puts "恭喜，您的邮件发送成功"
+		puts "邮件标题：#{subject}"
+		puts "Markdown：#{relative_path}"
+		puts "收件人：#{to}"
 	end
 end
