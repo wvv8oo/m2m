@@ -31,7 +31,7 @@ class Mailer
     	list = Hash.new
     	images.each { | line |
     		image = line[0]
-    		return if not /^[\.\/]/ =~ image
+    		next if not /^[\.\/]/ =~ image
 
     		#将全路径作为key，达到去重的效果
     		file = (root + Pathname.new(image)).to_s
@@ -55,7 +55,7 @@ class Mailer
 			"article" => article
 		}
 		body = @compiler.execute 'mail', data, false
-		body = self.get_ad + body
+		body = body + self.get_ad
 
 		#分析出图片列表
 		body = self.add_pictures mail, article, body
@@ -116,11 +116,14 @@ EOF
 	end
 
 	#获取邮件接收人
-	def get_to(to)
-		if not to
-			to = @mail_config['to']
-		end
+	def get_to(to, article)
+		meta = article['meta']
 
+		#优先取meta中的to
+		to = meta['to'] if not to and meta['to'] 
+		#如果meta没有to，且用户也没有指定to，则使用
+		to = @mail_config['to'] if not to
+		#依然没有找到收件人
 		return @util.error '邮件接收人无效，可使用-a参数指定收件人' if not to
 
 		to = [to] if to.class == String
@@ -155,15 +158,15 @@ EOF
 
 	#优先读取用户指定的，然后读取文章中指定的subject，再读取配置文件中的
 	def get_subject(subject, article)
-		#读取文章中mate的
-		if not subject
-			meta = article['meta']
-			subject = meta['subject'] if meta
-		end
-
+		meta = article['meta']
+		#读取文章中mate的，如果在命令行没有指定主题
+		subject = meta['subject'] if not subject and meta['subject']
+		
 		#文章中没有，则使用配置文件中的
 		subject = @mail_config['subject'] if not subject
-		#配置文件也没有，则使用文件名
+
+		#配置文件也没有，则使用title，article无论如何都会有title的
+		subject = meta['title'] if not subject
 
 		self.covert_date_macro subject
 	end
@@ -198,10 +201,10 @@ EOF
 
 	#发送邮件
 	def send(to, md_file, subject, force = false)
-		to = self.get_to to
-		from = self.get_from
 		article = self.get_article md_file
 
+		from = self.get_from
+		to = self.get_to to, article
 		subject = self.get_subject subject, article
 
 		relative_path = @util.get_relative_path article['file'], @util.workbench
