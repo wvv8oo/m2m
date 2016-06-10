@@ -2,6 +2,9 @@ require 'json'
 require 'yaml' 
 require 'fileutils'
 require 'singleton'
+require 'aescrypt'
+require 'base64'
+
 require_relative './product'
 
 class Util
@@ -13,6 +16,7 @@ class Util
     attr :project_name
     attr :workbench
     attr :build_dir, true
+    attr :encrypt_key
 
     def initialize
         #本地主题的目录
@@ -25,6 +29,7 @@ class Util
         @build_dir = nil
         #配置文件的文件名
         @config_file = 'm2m.config'
+        @encrypt_key = 'm2m'
     end
 
     ####################  属性 ####################
@@ -157,5 +162,14 @@ class Util
         }
 
         return false
+    end
+
+    ####################  加解密 ####################
+    def encrypt(str, encrypt_key = @encrypt_key)
+        AESCrypt.encrypt(str, encrypt_key)
+    end
+
+    def decrypt(str, encrypt_key = @encrypt_key)
+        AESCrypt.decrypt(str, encrypt_key)
     end
 end

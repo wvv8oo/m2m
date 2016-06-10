@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency('mustache', '1.0.3')
   spec.add_runtime_dependency('kramdown', '1.10.0')
   spec.add_runtime_dependency('mail', '2.6.4')
+  spec.add_runtime_dependency('aescrypt', '1.0.0')
 end
