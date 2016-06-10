@@ -1,11 +1,13 @@
 
 require 'pathname'
-require_relative 'util'
+require_relative './util'
+require_relative './setup'
 
 class Scan
     #初始化
     def initialize()
         @util = Util.instance
+        @setup = Setup.instance
         @files = Array.new
     end
 
@@ -20,8 +22,9 @@ class Scan
             #忽略的文件
             next if @util.is_shadow_file?(filename)
 
+            #检查是否配置文件中所忽略的文件
             #这里需要用相对路径
-            next if @util.is_user_ignore_file?(filename)
+            next if @setup.is_user_ignore_file?(filename)
 
             file = File::join(dir, filename)
             #如果是文件夹类型, 则继承查找
@@ -33,13 +36,13 @@ class Scan
             #如果文件扩展名是md, 则加入到files中
             if @util.is_markdown_file?(filename)
                 current_dir = Pathname.new file
-                @files.push current_dir.relative_path_from(@util.content_dir)
+                @files.push current_dir.relative_path_from(@setup.content_dir)
             end
         end
     end
 
     #执行
     def execute()
-        fetch @util.content_dir
+        fetch @setup.content_dir
     end
 end

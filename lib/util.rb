@@ -39,7 +39,7 @@ class Util
         }
     end
 
-
+    #设置workbench
     def workbench=(dir)
         #工作目录
         @workbench = dir

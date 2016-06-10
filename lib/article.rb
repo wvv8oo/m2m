@@ -6,19 +6,21 @@ require 'digest'
 require_relative 'meta'
 require_relative 'toc'
 require_relative 'util'
+require_relative 'setup'
 
 class Article
     def initialize
         @meta = Meta.new
         @toc = TOC.new
         @util = Util.instance
+        @setup = Setup.instance
     end
 
     #转换文件
     def convert(relative_path)
         result = Hash.new
 
-        file = File::join @util.content_dir, relative_path
+        file = File::join @setup.content_dir, relative_path
 
         #原始路径
         result['file'] = file

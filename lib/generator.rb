@@ -1,9 +1,11 @@
 #生成全站
+require 'fileutils'
+
 require_relative './scan'
 require_relative './compiler'
 require_relative './util'
 require_relative './store'
-require 'fileutils'
+require_relative './setup'
 
 class Generator
     def initialize
@@ -12,8 +14,10 @@ class Generator
 
         @store = Store.new scan.files
         @util = Util.instance
+        @setup = Setup.instance
+
         @compiler = Compiler.new
-        @page_size = @util.config['page_size'] or 10
+        @page_size = @setup.get_merged_config['page_size'] or 10
 
         self.generate_articles
         self.copy_theme_resource
@@ -115,8 +119,7 @@ class Generator
 
     #编译模板
     def compiler(filename, template_name, data)
-        data['product'] = @util.get_product
-        data['blog'] = @util.config['blog']
+        data['product'] = @util.get_product 
         data['root/relative_path'] = @util.get_relative_dot(filename)
 
         @compiler.execute template_name, data, true, filename
@@ -137,7 +140,7 @@ class Generator
 
     #复制文件到目标
     def copy(source, filename)
-        target = File::join @util.build_dir, filename
+        target = File::join @setup.target_dir, filename
 
         FileUtils.cp_r source, target
     end
@@ -155,24 +158,11 @@ class Generator
             current_path = @util.get_merge_path filename, @util.workbench
 
             #build和内容退出
-            next if @util.build_dir === current_path or
+            next if @setup.target_dir === current_path or
                 @util.content_dir === current_path or
-                @util.is_config_file? current_path
+                @setup.is_config_file? current_path
 
             this.copy File::join(@util.workbench, filename), filename
         }
     end
-
-=begin
-#创建rss
-def generate_rss
-
-end
-
-#创建tag页
-def generate_tag
-
-end
-=end
-
 end
