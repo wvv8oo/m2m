@@ -11,11 +11,12 @@ class Meta
         return nil if not original
 
         result = Hash.new
-        list = original.split(/\r\n/)
+        list = original.split(/[\r\n?]/)
 
         # 提取meta值
         list.each{ |line|
-            return if (/^(\w+):(.+)/i =~ line) == nil
+            next if line == ''
+            next if (/^(\w+):(.+)/i =~ line) == nil
 
             key = $1.lstrip.rstrip
             value = $2.lstrip.rstrip
