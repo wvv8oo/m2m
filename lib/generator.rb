@@ -9,12 +9,18 @@ require_relative './setup'
 
 class Generator
     def initialize
+        @util = Util.instance
+        @setup = Setup.instance
+
+        #删除目标目录
+        FileUtils.rmtree @setup.target_dir
+
+        #扫描文件
         scan = Scan.new
         scan.execute
 
+        #存储文件
         @store = Store.new scan.files
-        @util = Util.instance
-        @setup = Setup.instance
 
         @compiler = Compiler.new
         @page_size = @setup.get_merged_config['page_size'] || 10
