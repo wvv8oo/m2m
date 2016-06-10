@@ -88,7 +88,7 @@ class Mailer
 		smtp_server = @mail_config['smtp_server']
 		port = @mail_config['port']
 		username = @mail_config['username']
-		ssl = @mail_config['ssl']
+		ssl = @mail_config['ssl'] == 'y'
 		password = self.get_password
 
         #配置邮件参数
@@ -96,11 +96,10 @@ class Mailer
 		  delivery_method :smtp, {
 		  	:address => smtp_server,
 		  	:port => port,
-		  	# :domain => smtp_server,
-		  	:enable_ssl => true,
 		  	:user_name => username,
 		  	:password => password,
-		  	:enable_starttls_auto => false
+		  	:ssl => ssl,
+		  	:enable_starttls_auto => true
 		  }
 		end
 	end
