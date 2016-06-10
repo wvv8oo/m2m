@@ -2,9 +2,9 @@ require 'commander'
 require_relative '../lib/generator'
 require_relative '../lib/setup'
 
-module BuildCommand
-	def build(c)
-		c.syntax = 'm2m build [options]'
+module SiteCommand
+	def site(c)
+		c.syntax = 'm2m site [options]'
 		c.summary = ''
 		c.description = ''
 		c.example 'description', 'command example'

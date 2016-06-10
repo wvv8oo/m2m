@@ -3,14 +3,14 @@
 require 'rubygems'
 require 'commander'
 require_relative '../lib/generator'
-require_relative './build'
+require_relative './site'
 require_relative './mailer'
 require_relative './setup'
 
 class MyApplication
   include Commander::Methods
   # include whatever modules you need
-  include BuildCommand
+  include SiteCommand
   include MailCommand
   include SetupCommand
 
@@ -18,11 +18,11 @@ class MyApplication
     program :name, 'm2m'
     program :version, '0.0.1'
     program :description, 'Markdown to More'
-    default_command  :build
+    default_command  :site
 
     #生成博客
-    command :build do |c|
-      self.build(c)
+    command :site do |c|
+      self.site(c)
     end
 
     #发送邮件
