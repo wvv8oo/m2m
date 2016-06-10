@@ -80,8 +80,7 @@ class Mailer
 			}
 		end
 
-		puts password, encript_key
-		#@util.decrypt password, encript_key
+		@util.decrypt password, encript_key
 	end
 
 	#设置邮件的默认配置
@@ -98,6 +97,7 @@ class Mailer
 		  	:address => smtp_server,
 		  	:port => port,
 		  	# :domain => smtp_server,
+		  	:enable_ssl => true,
 		  	:user_name => username,
 		  	:password => password,
 		  	:enable_starttls_auto => false
@@ -122,7 +122,7 @@ EOF
 			to = @mail_config['to']
 		end
 
-		return @util.error '邮件接收人无效' if not to
+		return @util.error '邮件接收人无效，可使用-a参数指定收件人' if not to
 
 		to = [to] if to.class == String
 		to
@@ -218,7 +218,7 @@ EOF
 			from from
 			to to
 			subject subject
-		end
+		end 
 
 		self.add_content mail, article
 	

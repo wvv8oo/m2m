@@ -47,7 +47,7 @@ class Compiler
         #根据用户配置获取theme
         theme_name = @setup.get_merged_config['theme'] || 'hyde'
         theme_dir = File::join(base_dir, theme_name)
-        
+
         #如果没有找到对应的theme, 则
         return theme_dir if(File.exists?(theme_dir))
         File::join(base_dir, 'hyde')
@@ -63,7 +63,7 @@ class Compiler
     #执行生成,
     #filename: 相对文件路径
     def execute(type, data, auto_save = true, filename = '')
-        data['blog'] = @setup.get_mreged_config['blog']
+        data['blog'] = @setup.get_merged_config['blog']
         data['m2m'] = @util.get_product
 
         template = self.read_template type
