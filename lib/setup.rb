@@ -100,14 +100,21 @@ class Setup
 	#根据问题的配置文件列表，揭示用户输入
 	def ask_items(items, data)
 		items.each { |item|
-			value = ask(item['ask'], item['type']){|q| 
+			type = item['type']
+			value = ask(item['ask'], type){|q| 
 				q.default = item['default'] if item['default']
 				q.echo = item['echo'] if item['echo']
 				q.validate = item['validate'] if item['validate']
 				q.responses[:not_valid] = item['error'] if item['error']
 			}
 
-			data[item['key']] = value.to_s
+			if type == Integer
+				value = value.to_i
+			else
+				value = value.to_s
+			end
+
+			data[item['key']] = value
 		}
 		data
 	end
@@ -170,17 +177,26 @@ class Setup
 				'default' => mail_data['subject'],
 				'type' => String
 			},{
-				'key' => 'addressee',
+				'key' => 'to',
 				'ask' => '默认收件人，多个以逗号为分隔，非必填，按回车可以跳过',
-				'default' => mail_data['subject'],
+				'default' => mail_data['to'],
+				'type' => String
+			},{
+				'key' => 'ssl',
+				'ask' => '是否启用SSL，一般465或者587端口都会启用SSL，[y/n]',
+				'default' => mail_data['ssl'] || 'y',
+				'validate' => /^[yn]$/,
+				'error' => '请输入y或者n表示是否启用SSL',
 				'type' => String
 			}
 		]
 
 		mail_data = self.ask_items items, mail_data
 		#设置默认的format
-		mail_data['format'] = mail_data['format'] || '%Y/%m/%d'
-		mail_data['from'] = mail_data['from'] || mail_data['username']
+		mail_data['format'] = '%Y/%m/%d' if mail_data['format'] == ''
+		#没有设置from，则使用username
+		mail_data['from'] = mail_data['username'] if mail_data['from'] == ''
+
 		#填到mail
 		data['mail'] = mail_data
 
@@ -225,7 +241,6 @@ class Setup
 		mail_data['password'] = password
 		mail_data['safer'] = encrypt_key != ''
 
-		puts mail_data
 		data['mail'] = mail_data
 		self.write data, true
 	end
