@@ -17,7 +17,8 @@ class Generator
         @setup = Setup.instance
 
         @compiler = Compiler.new
-        @page_size = @setup.get_merged_config['page_size'] or 10
+        @page_size = @setup.get_merged_config['page_size'] || 10
+        @page_size = 10 if @page_size.class != Integer
 
         self.generate_articles
         self.copy_theme_resource
@@ -152,15 +153,15 @@ class Generator
             #忽略掉以.开头的, 以及markdown文件, 还有用户忽略的文件
             next if @util.is_shadow_file?(filename) or
                 @util.is_markdown_file?(filename) or
-                @util.is_user_ignore_file?(filename)
+                @setup.is_user_ignore_file?(filename)
 
             #当前的路径
             current_path = @util.get_merge_path filename, @util.workbench
 
             #build和内容退出
             next if @setup.target_dir === current_path or
-                @util.content_dir === current_path or
-                @setup.is_config_file? current_path
+                @setup.content_dir === current_path or
+                @util.is_config_file? current_path
 
             this.copy File::join(@util.workbench, filename), filename
         }

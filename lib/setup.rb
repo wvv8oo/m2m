@@ -4,7 +4,8 @@ require_relative './util'
 
 class Setup
 	include Singleton
-
+	attr :target_dir, true
+	
 	def initialize
 		@util = Util.instance
 		#合并后的配置信息

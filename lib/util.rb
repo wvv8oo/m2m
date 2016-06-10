@@ -1,4 +1,3 @@
-require 'json'
 require 'yaml' 
 require 'fileutils'
 require 'singleton'
