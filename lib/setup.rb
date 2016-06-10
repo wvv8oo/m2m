@@ -35,8 +35,9 @@ class Setup
         dir = config['target'] if not dir
 
         #依然没有获取准确的目录，则使用使用临时目录
-        dir = File::join(@util.get_temp_dir, @util.project_name) if not dir
-
+        # dir = File::join(@util.get_temp_dir, @util.project_name) if not dir
+        #如果没有获取构建目录，则在当前目录下，创建一个
+        dir = './m2m_site' if not dir
         #如果是字符类型，则获取相对于workbench的目录
         @target_dir = @util.get_merge_path dir if dir.class == String
 
