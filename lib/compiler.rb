@@ -63,7 +63,7 @@ class Compiler
     #执行生成,
     #filename: 相对文件路径
     def execute(type, data, auto_save = true, filename = '')
-        data['blog'] = @setup.get_merged_config['blog']
+        data['site'] = @setup.get_merged_config['site']
         data['m2m'] = @util.get_product
 
         template = self.read_template type
