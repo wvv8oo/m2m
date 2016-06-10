@@ -202,6 +202,7 @@ class Setup
 
 		#写入文件
 		self.write data, true
+		puts '您的邮件基本信息配置成功'
 
 		#询问密码
 		self.ask_mail_password
@@ -243,5 +244,30 @@ class Setup
 
 		data['mail'] = mail_data
 		self.write data, true
+		puts '您的邮件密码配置成功'
+	end
+
+	#配置网站相关的
+	def ask_site
+		data = self.read false
+		site_data = data['site'] || {}
+
+		items = [
+			{
+				'key' => 'title',
+				'ask' => '您的网站标题，如：M2M官方网站，按回车跳过',
+				'default' => site_data['title'],
+				'type' => String
+			},{
+				'key' => 'host',
+				'ask' => '主机地址，如：http://m2m.wvv8oo.com/，按回车跳过',
+				'default' => site_data['host'],
+				'type' => String
+			}
+		]
+
+		data['site'] = self.ask_items items, site_data
+		self.write data, false
+		puts '您的网站配置成功，更多配置请手动调整'
 	end
 end
