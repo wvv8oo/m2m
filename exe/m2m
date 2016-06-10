@@ -5,12 +5,14 @@ require 'commander'
 require_relative '../lib/generator'
 require_relative './build'
 require_relative './mailer'
+require_relative './setup'
 
 class MyApplication
   include Commander::Methods
   # include whatever modules you need
   include BuildCommand
   include MailCommand
+  include SetupCommand
 
   def run
     program :name, 'm2m'
@@ -18,14 +20,21 @@ class MyApplication
     program :description, 'Markdown to More'
     default_command  :build
 
+    #生成博客
     command :build do |c|
       self.build(c)
     end
 
+    #发送邮件
     command :mail do |c|
       self.mail(c)
     end
     
+    #配置相关
+    command :setup do |c|
+      self.setup c
+    end
+
     run!
   end
 end
