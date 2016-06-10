@@ -9,9 +9,51 @@ class Setup
 		@util = Util.instance
 		#合并后的配置信息
 		@merge_config = nil
+		#内容目录
+		@content_dir = nil
+		#构建的目标目录
+        @target_dir = nil
+        #邮件的配置
+        @mail_config = nil
 	end
 
-	def get_config(is_global = true)
+	#读取邮件的配置
+	def mail_config
+		@mail_config = self.get_merged_config['mail'] if not @mail_config
+		@mail_config
+	end
+
+	#最终的构建目录
+    def target_dir
+        dir = @target_dir
+        #已经处理过了
+        return dir if dir.class == Pathname
+
+        #如果没有指定构建目录，则使用配置文件的目录
+        config = self.get_merged_config
+        dir = config['target'] if not dir
+
+        #依然没有获取准确的目录，则使用使用临时目录
+        dir = File::join(@util.get_temp_dir, @util.project_name) if not dir
+
+        #如果是字符类型，则获取相对于workbench的目录
+        @target_dir = @util.get_merge_path dir if dir.class == String
+
+        @target_dir
+    end
+
+	#获取内容的目录
+    def content_dir
+        if not @content_dir
+            content_dir = self.get_merged_config['content'] || './'
+            @content_dir = @util.get_merge_path(content_dir, @util.workbench)
+        end
+
+        @content_dir
+    end
+
+	#获取配置文件的地址
+	def get_config_file(is_global = true)
 		root = is_global ? @util.get_temp_dir : @util.workbench
 		#全局的配置文件
 		File::join root, @util.config_file
@@ -19,7 +61,7 @@ class Setup
 
 	#读取配置文件
 	def read(is_global)
-		file = self.get_config is_global
+		file = self.get_config_file is_global
 		return {} if not File::exists? file
 
 		#读取配置文件 
@@ -28,19 +70,32 @@ class Setup
 
 	#写入配置文件
 	def write(config, is_global)
-		file = self.get_config is_global
+		file = self.get_config_file is_global
 		@util.write_file file, config.to_yaml
 	end
 
 	#读取本地与全局的配置文件，然后合并
-	def read_merge
-		return @merge_config if merge_config
+	def get_merged_config
+		return @merge_config if @merge_config
 
 		global_config = self.read true
 		local_config = self.read false
 		@merge_config = global_config.merge local_config
 		@merge_config
 	end
+
+    #是否为用户在配置文件中的忽略的文件
+    def is_user_ignore_file?(file)
+    	config = self.get_merged_config
+        ignores = config['ignore']
+        return false if not ignores
+
+        ignores.each { |current|
+            #TODO 这里还需要再增加
+        }
+
+        return false
+    end
 
 	#根据问题的配置文件列表，揭示用户输入
 	def ask_items(items, data)
@@ -56,6 +111,7 @@ class Setup
 		}
 		data
 	end
+
 
 	#询问用户的信息
 	def ask_mail
@@ -97,7 +153,7 @@ class Setup
 				'type' => String
 			},{
 				'key' => 'addressee',
-				'ask' => '常用收件人，多个以逗号为分隔，非必填，按回车可以跳过',
+				'ask' => '默认收件人，多个以逗号为分隔，非必填，按回车可以跳过',
 				'default' => mail_data['subject'],
 				'type' => String
 			}
