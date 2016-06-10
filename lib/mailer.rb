@@ -4,13 +4,14 @@ require_relative './scan'
 require_relative './compiler'
 require_relative './util'
 require_relative './store'
+require_relative './setup'
 
 class Mailer
 	def initialize
 		@util = Util.instance
-		@mail_config = @util.config['mail']
-
-		return @util.error '请配置邮件参数' if not @mail_config
+		@mail_config = Setup.instance.get_merged_config['mail']
+		#检查邮件的配置信息
+		Setup.instance.check_mail_setup
 
 		#扫描所有文件
         scan = Scan.new
@@ -18,8 +19,6 @@ class Mailer
 
         @store = Store.new scan.files
         @compiler = Compiler.new
-
-        self.set_mail_defaults
 	end
 
 	#添加附件, 并返回替换后的body
@@ -68,13 +67,30 @@ class Mailer
 		end
 	end
 
+	#获取用户的密码，如果用户使用了密码进行加密，则提示用户输入密钥
+	def get_password
+		safer = @mail_config['safer']
+		password = @mail_config['password']
+
+		encrypt_key = nil
+		if safer
+			message = "请输入加密您密码的钥匙"
+			encript_key = ask(message, String){|q| 
+				q.echo = '*'
+			}
+		end
+
+		puts password, encript_key
+		#@util.decrypt password, encript_key
+	end
+
 	#设置邮件的默认配置
 	def set_mail_defaults
-		smtp_server = @mail_config['smtp']
+		smtp_server = @mail_config['smtp_server']
 		port = @mail_config['port']
-		password = @mail_config['password']
-		username = @mail_config['account']
+		username = @mail_config['username']
 		ssl = @mail_config['ssl']
+		password = self.get_password
 
         #配置邮件参数
 		Mail.defaults do
@@ -190,6 +206,9 @@ EOF
 		subject = self.get_subject subject, article
 
 		relative_path = @util.get_relative_path article['file'], @util.workbench
+
+		#配置邮件信息
+		self.set_mail_defaults
 
 		#警示用户是否需要发送
 		self.alarm relative_path, subject, to if not force
