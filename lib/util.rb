@@ -12,10 +12,8 @@ class Util
     
     attr :config_file
     attr :local_theme_dir
-    attr :config
     attr :project_name
     attr :workbench
-    attr :build_dir, true
     attr :encrypt_key
 
     def initialize
@@ -23,25 +21,13 @@ class Util
         @local_theme_dir = '.theme'
         #当前的工作目录
         @workbench = nil
-        #markdown的文件目录
-        @content_dir = nil
-        #构建的目标目录
-        @build_dir = nil
+        
         #配置文件的文件名
         @config_file = 'm2m.config'
         @encrypt_key = 'm2m'
     end
 
     ####################  属性 ####################
-    def content_dir
-        #获取文件的根目录
-        if not @content_dir
-            @content_dir = self.get_merge_path(@config['content'] || './', @workbench)
-        end
-
-        @content_dir
-    end
-
 
     #获取产品相关的信息
     def get_product
@@ -53,37 +39,8 @@ class Util
         }
     end
 
-    #最终的构建目录
-    def build_dir
-        dir = @build_dir
-        #已经处理过了
-        return dir if dir.class == Pathname
-
-        #如果没有指定构建目录，则使用配置文件的目录
-        dir = @config['target'] if not dir
-        #依然没有获取准确的目录，则使用使用临时目录
-        dir = File::join(@get_temp_dir, @project_name) if not dir
-
-        #如果是字符类型，则获取相对于workbench的目录
-        if dir.class == String
-            @build_dir = self.get_merge_path(dir)
-        end
-
-        @build_dir
-    end
 
     def workbench=(dir)
-        #在设置工作目录的时候，检查配置文件
-        file = self.get_merge_path @config_file, dir
-        if not File::exists?(@config_file)
-            self.error '提示: 配置文件<m2m.config>不存在, 请使用命令<m2m init --config>创建'
-        end
-
-        #读取配置文件
-        @config = JSON.parse IO.read(file)
-        #使用yaml的格式
-        # @config = YAML.load IO.read(file)
-
         #工作目录
         @workbench = dir
         #项目名称
@@ -150,18 +107,6 @@ class Util
     #检查文件是否为.开头的文件
     def is_shadow_file?(file)
         (/^\./ =~ file) != nil
-    end
-
-    #是否为用户忽略的文件
-    def is_user_ignore_file?(file)
-        ignore = @config['ignore']
-        return false if not ignore
-
-        ignore.each { |current|
-            #TODO 这里还需要再增加
-        }
-
-        return false
     end
 
     ####################  加解密 ####################
