@@ -112,6 +112,24 @@ class Setup
 		data
 	end
 
+	#检查邮件的配置
+	def check_mail_setup
+		mail_config = self.get_merged_config['mail']
+
+		return @util.error '请执行[m2m mail --setup]启动配置' if not mail_config
+		
+		items = {
+			'smtp_server' => 'STMP服务器',
+			'port' => '端口',
+			'username' => '用户名',
+			'password' => '密码',
+			'from' => '发件人'
+		}
+
+		items.each {|key, desc|
+			@util.error "#{desc}没有配置，请执行[m2m mail --setup]启动配置" if mail_config[key] == ''
+		}
+	end
 
 	#询问用户的信息
 	def ask_mail
