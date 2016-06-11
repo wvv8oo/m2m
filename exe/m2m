@@ -6,12 +6,14 @@ require_relative '../lib/generator'
 require_relative './site'
 require_relative './mailer'
 require_relative './setup'
+require_relative './server'
 
-class MyApplication
+class Application
   include Commander::Methods
   # include whatever modules you need
   include SiteCommand
   include MailCommand
+  include ServerCommand
   include SetupCommand
 
   def run
@@ -23,6 +25,11 @@ class MyApplication
     #生成博客
     command :site do |c|
       self.site(c)
+    end
+
+    #启动服务器
+    command :server do |c|
+      self.server(c)
     end
 
     #发送邮件
@@ -39,6 +46,6 @@ class MyApplication
   end
 end
 
-MyApplication.new.run
+Application.new.run
 
 # MyApplication.new.run if $0 == __FILE__
