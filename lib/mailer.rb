@@ -200,7 +200,7 @@ EOF
 	end
 
 	#发送邮件
-	def send(to, md_file, subject, force = false)
+	def send(to, md_file, subject, silent = false)
 		article = self.get_article md_file
 
 		from = self.get_from
@@ -213,7 +213,7 @@ EOF
 		self.set_mail_defaults
 
 		#警示用户是否需要发送
-		self.alarm relative_path, subject, to if not force
+		self.alarm relative_path, subject, to if not silent
 
 		#创建一个mail的实例，以后再添加附件和html内容
 		mail = Mail.new do
