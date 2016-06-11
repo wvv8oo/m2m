@@ -7,7 +7,6 @@ module SiteCommand
 		c.syntax = 'm2m site [options]'
 		c.summary = ''
 		c.description = ''
-		c.example 'description', 'command example'
 		c.option '-s STRING', '--source STRING', String, 'Markdown源文件的目录'
 		c.option '-t STRING', '--target STRING', String, '生成的目标目录'
 		c.option '--force', String, '强行生成，如果目录存在，则会被删除'
