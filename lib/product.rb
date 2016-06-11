@@ -1,6 +1,6 @@
 module M2M
-  VERSION = "0.1.3"
-  NAME = "M2M"
+  VERSION = "0.2.0"
+  NAME = "m2m"
   REPOS = "https://github.com/wvv8oo/m2m"
-  HOMEPAGE = "http://m2m.wvv8oo.com"
+  HOMEPAGE = "http://m2m.wvv8oo.com/"
 end
