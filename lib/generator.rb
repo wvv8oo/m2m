@@ -159,6 +159,7 @@ class Generator
             #忽略掉以.开头的, 以及markdown文件, 还有用户忽略的文件
             next if @util.is_shadow_file?(filename) or
                 @util.is_markdown_file?(filename) or
+                @util.local_theme_dir == filename or
                 @setup.is_user_ignore_file?(filename)
 
             #当前的路径
