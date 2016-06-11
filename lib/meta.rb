@@ -31,7 +31,7 @@ class Meta
     def analysis(original)
         result = Hash.new
 
-        pattern = /(\s+)?<!\-\-(.+)\-\->(.+)?/m
+        pattern = /(\s+)?<!\-\-(.+?)\-\->(.+)?/m
         matches = pattern.match(original)
 
         #如果没有匹配到, 则body就是完整的original
