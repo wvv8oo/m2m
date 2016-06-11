@@ -1,6 +1,7 @@
 require 'yaml' 
 require 'singleton'
 require_relative './util'
+require_relative './product'
 
 class Setup
 	include Singleton
@@ -37,7 +38,7 @@ class Setup
         #依然没有获取准确的目录，则使用使用临时目录
         # dir = File::join(@util.get_temp_dir, @util.project_name) if not dir
         #如果没有获取构建目录，则在当前目录下，创建一个
-        dir = './m2m_site' if not dir
+        dir = './m2m-site' if not dir
         #如果是字符类型，则获取相对于workbench的目录
         @target_dir = @util.get_merge_path dir if dir.class == String
 
@@ -149,43 +150,43 @@ class Setup
 		items = [
 			{
 				'key' => 'smtp_server',
-				'ask' => '请输入您的STMP服务器地址，如smpt.163.com',
+				'ask' => '请输入您的【SMTP服务器地址】，如smpt.163.com',
 				'default' => mail_data['smtp_server'],
 				'type' => String,
 				'validate' => /(\.[a-zA-Z0-9\-]+){2,}/,
 				'error' => '您的SMTP地址输入不正确，请输入域名或者IP地址'
 			},{
 				'key' => 'port',
-				'ask' => '邮件发送的端口，默认为465',
+				'ask' => '请输入您的【SMTP端口】，默认为465',
 				'default' => mail_data['port'] || 465,
 				'type' => Integer,
 				'validate' => /^\d+$/,
 				'error' => '您的端口输入不正确，只能输入整数'
 			},{
 				'key' => 'username',
-				'ask' => '邮件帐号，如mail@example.com',
+				'ask' => '请输入您的【邮件帐号】，如mail@example.com',
 				'default' => mail_data['username'],
 				'type' => String,
 				'validate' => /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/,
 				'error' => '您的邮箱帐号输入不正确'
 			},{
 				'key' => 'from',
-				'ask' => '发件人，如<张三> mail@example.com，如果没有设置，则与邮件帐号一致',
+				'ask' => '请输入您的【发件人邮件地址】，如<张三> mail@example.com，如果没有设置，则与邮件帐号一致',
 				'default' => mail_data['from'],
 				'type' => String
 			},{
 				'key' => 'subject',
-				'ask' => '默认的邮件主题，非必填，按回车可以跳过',
+				'ask' => '请输入您的【默认邮件主题】，非必填，按回车可以跳过',
 				'default' => mail_data['subject'],
 				'type' => String
 			},{
 				'key' => 'to',
-				'ask' => '默认收件人，多个以逗号为分隔，非必填，按回车可以跳过',
+				'ask' => '请输入您的【默认收件人】，多个以逗号为分隔，非必填，按回车可以跳过',
 				'default' => mail_data['to'],
 				'type' => String
 			},{
 				'key' => 'ssl',
-				'ask' => '是否启用SSL，一般465或者587端口都会启用SSL，[y/n]',
+				'ask' => '请确认【是否启用SSL】，一般465或者587端口都会启用SSL，[y/n]',
 				'default' => mail_data['ssl'] || 'y',
 				'validate' => /^[yn]$/,
 				'error' => '请输入y或者n表示是否启用SSL',
@@ -204,21 +205,22 @@ class Setup
 
 		#写入文件
 		self.write data, true
-		puts '您的邮件基本信息配置成功'
 
 		#询问密码
-		self.ask_mail_password
+		self.ask_mail_password false
+
+		puts "您的邮件基本信息配置成功，更多配置方式请参考：#{M2M::HOMEPAGE}config.html"
 	end
 
 	#用户输入密码以及加密内容
-	def ask_mail_password
+	def ask_mail_password(show_success_message = false)
 		data = self.read true
 		mail_data = data['mail'] || {}
 
 		items = [
 			{
 				'key' => 'password',
-				'ask' => '您邮件密码，邮件密码以加密的方式保存在您本地电脑上',
+				'ask' => '请输入您的【邮箱密码】，邮件密码以加密的方式保存在您本地电脑上',
 				'default' => nil,
 				'echo' => '*',
 				'type' => String,
@@ -226,7 +228,7 @@ class Setup
 				'error' => '请输入您的邮件密码'
 			},{
 				'key' => 'encrypt_key',
-				'ask' => '用于加密您密码的钥匙，请牢记，按回车可以跳过',
+				'ask' => '请输入您的【加密钥匙】，此钥匙用于解密您的密码，请务必牢记，按回车可以跳过',
 				'default' => nil,
 				'echo' => '*',
 				'type' => String
@@ -246,7 +248,8 @@ class Setup
 
 		data['mail'] = mail_data
 		self.write data, true
-		puts '您的邮件密码配置成功'
+
+		puts '您的邮件密码配置成功' if show_success_message
 	end
 
 	#配置网站相关的
@@ -270,6 +273,6 @@ class Setup
 
 		data['site'] = self.ask_items items, site_data
 		self.write data, false
-		puts '您的网站配置成功，更多配置请手动调整'
+		puts "您的网站配置成功，更多配置方式请参考：#{M2M::HOMEPAGE}config.html"
 	end
 end
