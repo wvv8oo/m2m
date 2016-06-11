@@ -17,7 +17,7 @@ class Util
 
     def initialize
         #本地主题的目录
-        @local_theme_dir = '.theme'
+        @local_theme_dir = 'm2m-theme'
         #当前的工作目录
         @workbench = nil
         
