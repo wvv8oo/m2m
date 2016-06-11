@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require './lib/product'
 
 Gem::Specification.new do |spec|
-  spec.executables   = ["m2m"]
+  spec.executables   = [M2M::NAME]
   spec.name          = M2M::NAME
   spec.version       = M2M::VERSION
   spec.authors       = ["wvv8oo"]
@@ -36,4 +36,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency('kramdown', '1.10.0')
   spec.add_runtime_dependency('mail', '2.6.4')
   spec.add_runtime_dependency('aescrypt', '1.0.0')
+  spec.add_runtime_dependency('webrick', '1.3.1')
 end
