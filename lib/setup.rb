@@ -17,13 +17,22 @@ class Setup
         @target_dir = nil
         #邮件的配置
         @mail_config = nil
+        #网站的配置
+        @site_config = nil
 	end
 
 	#读取邮件的配置
 	def mail_config
-		@mail_config = self.get_merged_config['mail'] if not @mail_config
+		@mail_config = self.get_merged_config['mail'] || {} if not @mail_config
 		@mail_config
 	end
+
+	#读取网站的配置
+	def site_config
+		@site_config = self.get_merged_config['site'] || {} if not @mail_config
+		@site_config
+	end
+
 
 	#最终的构建目录
     def target_dir
