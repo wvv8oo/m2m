@@ -37,4 +37,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency('mail', '2.6.4')
   spec.add_runtime_dependency('aescrypt', '1.0.0')
   spec.add_runtime_dependency('webrick', '1.3.1')
+  spec.add_runtime_dependency('rdoc', '4.2.2')
 end
