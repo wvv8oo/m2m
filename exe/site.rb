@@ -10,6 +10,7 @@ module SiteCommand
 		c.option '-s STRING', '--source STRING', String, 'Markdown源文件的目录'
 		c.option '-t STRING', '--target STRING', String, '生成的目标目录'
 		c.option '--force', String, '强行生成，如果目录存在，则会被删除'
+		c.option '--git', String, '提交到git仓库'
 		c.action do |args, options|
 			target = options.target
 			source = options.source
@@ -32,6 +33,11 @@ module SiteCommand
 
 			#执行生成
 			Generator.new
+
+			if options.git
+				command = "cd #{util.workbench} && git add . && git commit -m 'update by m2m' && git push";
+				exec command
+			end
 		end
 	end
 end
