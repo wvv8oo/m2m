@@ -23,18 +23,30 @@ class Generator
         @store = Store.new scan.files
 
         @compiler = Compiler.new
-        @page_size = @setup.get_merged_config['page_size'] || 10
+        @page_size = @setup.site_config['page_size'] || 10
         @page_size = 10 if @page_size.class != Integer
 
         self.generate_articles
         self.copy_theme_resource
-        #复制文件有问题
+
+        #复制文件
         self.copy_workbench_resource
+        #生成首页
         self.generate_home
+        #生成索引页
         self.generate_all_index @store.tree, '', true
+
+        #如果需要执行命令命令
+        self.execute_after_build
         puts 'Done...'
     end
 
+    #build后执行的脚本
+    def execute_after_build
+        command = @setup.site_config['after_build_shell']
+        return if not command
+        exec command
+    end
     #创建首页
     def generate_home
         children = @store.get_children(@store.tree)
