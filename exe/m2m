@@ -7,6 +7,7 @@ require_relative './site'
 require_relative './mailer'
 require_relative './setup'
 require_relative './server'
+require_relative './lib/product'
 
 class Application
   include Commander::Methods
@@ -17,8 +18,8 @@ class Application
   include SetupCommand
 
   def run
-    program :name, 'm2m'
-    program :version, '0.0.1'
+    program :name, M2M::NAME
+    program :version, M2M::VERSION
     program :description, 'Markdown to More'
     default_command  :site
 
