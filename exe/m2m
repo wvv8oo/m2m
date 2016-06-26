@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- coding: utf-8 -*-
 
 require 'rubygems'
 require 'commander'
@@ -7,7 +8,7 @@ require_relative './site'
 require_relative './mailer'
 require_relative './setup'
 require_relative './server'
-require_relative './lib/product'
+require_relative '../lib/product'
 
 class Application
   include Commander::Methods

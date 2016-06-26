@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #将markdown发送为邮件
 require 'mail'
 require_relative './scan'

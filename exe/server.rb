@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 require 'commander'
 require_relative '../lib/generator'
 require_relative '../lib/setup'

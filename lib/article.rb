@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #读取文件内容
 require 'nokogiri'
 require 'kramdown'
@@ -30,7 +32,7 @@ class Article
         result['mtime'] = File::ctime file
 
         #读取原始内容
-        original = IO.read(file)
+        original = @util.read_file file
         result['original'] = original
 
         #相对路径

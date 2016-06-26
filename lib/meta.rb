@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #分析meta值
 # http://pythonhosted.org/Markdown/extensions/meta_data.html
 

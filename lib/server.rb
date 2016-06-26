@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 require 'webrick'
 require_relative './util'
 require_relative './setup'
