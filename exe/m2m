@@ -9,6 +9,7 @@ require_relative './mailer'
 require_relative './setup'
 require_relative './server'
 require_relative '../lib/product'
+require_relative './init'
 
 class Application
   include Commander::Methods
@@ -17,6 +18,7 @@ class Application
   include MailCommand
   include ServerCommand
   include SetupCommand
+  include InitCommand
 
   def run
     program :name, M2M::NAME
@@ -42,6 +44,11 @@ class Application
     #配置相关
     command :setup do |c|
       self.setup c
+    end
+
+    #配置相关
+    command :init do |c|
+      self.init c
     end
 
     run!
