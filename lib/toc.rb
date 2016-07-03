@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #读取文件内容
 
 require 'kramdown'

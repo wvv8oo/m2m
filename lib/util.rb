@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 require 'yaml' 
 require 'fileutils'
 require 'singleton'
@@ -46,6 +48,10 @@ class Util
         @project_name = File::basename dir
     end
 
+    #获取m2m自带theme的目录
+    def themes_dir
+        File::join(Pathname.new(File.dirname(__FILE__)), 'themes')
+    end
     ####################  获取 ####################
     #临时目录
     def get_temp_dir
@@ -84,9 +90,15 @@ class Util
         # puts dir
         FileUtils.mkpath(dir) if not File::exists?(dir)
         #写入文件
-        IO.write(file, content)
+        IO.write(file, content, :encoding => 'utf-8')
     end
 
+    #读取文件
+    def read_file(file)
+        IO.read file, :encoding => 'utf-8'
+    end
+
+    #错误
     def error(log, level = 1)
         puts log
         exit level
