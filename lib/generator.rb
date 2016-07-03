@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #生成全站
 require 'fileutils'
 
@@ -138,6 +140,7 @@ class Generator
 
     #编译模板
     def compiler(filename, template_name, data)
+        data['categories'] = @store.categories
         data['product'] = @util.get_product 
         data['root/relative_path'] = @util.get_relative_dot(filename)
 
