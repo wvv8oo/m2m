@@ -1,0 +1,31 @@
+<div class="book-summary">
+  <ul class="summary">
+    {{#categories}}
+      <!--根目录的文章-->
+      <li class="chapter" data-path="{{relative_url}}">
+        <a href="{{relative_url}}">
+          {{title}}
+        </a>
+
+        {{#__children__}}
+
+        <ul class="articles">
+          <li class="chapter">
+            <a href="/{{relative_url}}">
+              {{title}}
+            </a>
+          </li>
+        </ul>
+
+        {{/__children__}}
+      </li>
+    {{/categories}}
+
+    <li class="divider"></li>
+    <li>
+      <a href="{{m2m.homepage}}" target="blank" class="gitbook-link">
+        Published with {{m2m.name}}
+      </a>
+    </li>
+  </ul>
+</div>
