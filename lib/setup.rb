@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 require 'yaml' 
 require 'singleton'
 require_relative './util'
@@ -71,13 +73,28 @@ class Setup
 		File::join root, @util.config_file
 	end
 
+	#获取用户的theme, 如果没有找到，返回null
+	def get_theme
+		#根据用户配置获取theme
+        theme_name = self.get_merged_config['theme']
+        #用户没有配置自己的theme
+        return if not theme_name
+
+        #如果是相对路径， 则认为用户是配置在当前的目录下
+        if theme_name.index('./') === 0
+        	return File::join(@util.workbench, theme_name)
+        else
+        	return File::join(@util.themes_dir, theme_name)
+        end
+	end
+
 	#读取配置文件
 	def read(is_global)
 		file = self.get_config_file is_global
 		return {} if not File::exists? file
 
 		#读取配置文件 
-        YAML.load IO.read(file)
+        YAML.load @util.read_file(file)
 	end
 
 	#写入配置文件
