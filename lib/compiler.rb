@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+
 #使用模板转换为HTML
 
-require 'mustache'
 require 'pathname'
+require 'mustache'
 require 'fileutils'
 
 require_relative './util'
@@ -15,6 +17,7 @@ class Compiler
         #当前的工作目录
         @workbench = @util.workbench
         @theme_dir = self.get_theme_dir
+
         @template_dir = File::join(@theme_dir, 'template')
         Mustache.template_path = File::join(@template_dir, 'partials')
 
@@ -34,30 +37,27 @@ class Compiler
         dir
     end
 
+
     #根据配置获取theme, 如果没有, 则使用默认的theme
     def get_theme_dir()
-        #先从当前工作目录下查找theme目录
-        dir = File::join(@workbench, @util.local_theme_dir)
-        #当前有theme目录
-        return dir if(File::exists?(dir))
+        #获取用户配置的theme
+        theme_dir = @setup.get_theme
+        #如果这个目录存在，则使用用户设置的主题
+        return theme_dir if theme_dir and File::exists?(theme_dir)
 
-        base_dir = File::join(Pathname.new(File.dirname(__FILE__)), 'themes')
+        #没有找到配置，则考虑默认的theme目录
+        theme_dir = File::join(@workbench, @util.local_theme_dir)
+        return theme_dir if(File::exists?(theme_dir))
 
-        
-        #根据用户配置获取theme
-        theme_name = @setup.get_merged_config['theme'] || 'hyde'
-        theme_dir = File::join(base_dir, theme_name)
-
-        #如果没有找到对应的theme, 则
-        return theme_dir if(File.exists?(theme_dir))
-        File::join(base_dir, 'hyde')
+        #还是没有找到，则使用系统自带主题
+        File::join(@util.themes_dir, 'hyde')
     end
 
 
     #读取模板
     def read_template(name)
         file = File::join(@template_dir, name + '.mustache')
-        IO.read(file)
+        @util.read_file file
     end
 
     #执行生成,
